@@ -1,0 +1,12 @@
+Source: ros-kilted-rewire
+Section: misc
+Priority: optional
+Maintainer: "Alvaro Gaona" <alvgaona@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libudev-dev, ros-kilted-ament-cmake, ros-kilted-ros-workspace
+Homepage: https://rewire.run
+Standards-Version: 3.9.2
+
+Package: ros-kilted-rewire
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kilted-ament-index-python, ros-kilted-launch, ros-kilted-ros2launch, ros-kilted-ros-workspace
+Description: Launch integration for rewire, a drop-in ROS 2 bridge for the Rerun viewer.

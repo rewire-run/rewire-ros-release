@@ -1,0 +1,95 @@
+name: deb
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # Only bites on a tag. Every other event passes straight through so the deb job
+  # can depend on it unconditionally.
+  validate:
+    name: validate-tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rewire-run/actions/validate-tag@v1
+        if: github.ref_type == 'tag'
+
+      - uses: actions/checkout@v5
+        if: github.ref_type == 'tag'
+
+      # The deb takes its version from package.xml, so a tag that disagrees with it
+      # would attach a deb of one version to a release named for another.
+      - name: Check the tag matches package.xml
+        if: github.ref_type == 'tag'
+        run: |
+          VERSION="$(sed -n 's:.*<version>\(.*\)</version>.*:\1:p' package.xml | head -1)"
+          if [ "v${VERSION}" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match the version ${VERSION} in package.xml"
+            exit 1
+          fi
+
+  deb:
+    name: deb-${{ matrix.distro }}
+    needs: validate
+    runs-on: ubuntu-latest
+    container: ros:${{ matrix.distro }}-ros-base
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [humble, jazzy, kilted, lyrical]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build the deb
+        run: scripts/build-deb.sh ${{ matrix.distro }}
+
+      - name: Install it, letting apt pull rewire in
+        run: scripts/test-deb.sh ${{ matrix.distro }} ros-${{ matrix.distro }}-rewire_*_all.deb
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: deb-${{ matrix.distro }}
+          path: "*.deb"
+
+  release:
+    name: attach-to-release
+    needs: deb
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: deb-*
+          merge-multiple: true
+          path: debs
+
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: "debs/*.deb"
+
+  # A manual run republishes the current debs, which is the way to recover
+  # from a lost publish and to test the action from a branch.
+  apt:
+    name: apt-publish
+    needs: deb
+    if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: deb-*
+          merge-multiple: true
+          path: debs
+
+      - uses: rewire-run/actions/apt-publish@v1
+        with:
+          debs: debs/*.deb
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

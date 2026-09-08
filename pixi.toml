@@ -1,0 +1,46 @@
+[workspace]
+name = "rewire-ros"
+platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
+channels = ["conda-forge"]
+preview = ["pixi-build"]
+
+# Name and version come from package.xml. The backend prefixes ros-<distro>-,
+# reading the distro off the robostack channel of whichever environment builds it.
+[package]
+
+[package.build.backend]
+name = "pixi-build-ros"
+version = "*"
+channels = ["https://prefix.dev/conda-forge"]
+
+# Not in the backend's default globs, so a pin bump would otherwise reuse the cached build.
+[package.build.config]
+extra-input-globs = ["sources.json"]
+
+[tasks]
+check = "ros2 run rewire rewire --version && ros2 launch rewire rewire.launch.py --show-args"
+
+[environments]
+default = { features = ["jazzy"], solve-group = "jazzy" }
+humble = { features = ["humble"], solve-group = "humble" }
+jazzy = { features = ["jazzy"], solve-group = "jazzy" }
+kilted = { features = ["kilted"], solve-group = "kilted" }
+lyrical = { features = ["lyrical"], solve-group = "lyrical" }
+
+[feature.humble]
+channels = ["robostack-humble"]
+dependencies = { ros-humble-rewire = { path = "." }, ros-humble-ros2launch = "*", ros-humble-ros2run = "*" }
+
+[feature.jazzy]
+channels = ["robostack-jazzy"]
+dependencies = { ros-jazzy-rewire = { path = "." }, ros-jazzy-ros2launch = "*", ros-jazzy-ros2run = "*" }
+
+[feature.kilted]
+channels = ["robostack-kilted"]
+dependencies = { ros-kilted-rewire = { path = "." }, ros-kilted-ros2launch = "*", ros-kilted-ros2run = "*" }
+
+# Spelled as a full URL: robostack-lyrical publishes on prefix.dev only, and
+# a bare channel name resolves against conda.anaconda.org, where it 404s.
+[feature.lyrical]
+channels = ["https://prefix.dev/robostack-lyrical"]
+dependencies = { ros-lyrical-rewire = { path = "." }, ros-lyrical-ros2launch = "*", ros-lyrical-ros2run = "*" }

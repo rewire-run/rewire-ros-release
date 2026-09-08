@@ -1,3 +1,26 @@
+## rewire_ros (humble) - 0.1.0-1
+
+The packages in the `rewire_ros` repository were released into the `humble` distro by running `/usr/bin/bloom-release --no-web --no-pull-request --ros-distro humble --track humble rewire_ros --override-release-repository-url https://github.com/rewire-run/rewire-ros-release.git` on `Tue, 08 Sep 2026 15:49:58 -0000`
+
+The `rewire` package was released.
+
+Version of package(s) in repository `rewire_ros`:
+
+- upstream repository: https://github.com/rewire-run/rewire-ros.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.1.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.14.3`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.1.0`
+- vcstools version: `0.1.42`
+
+
 <h1 align="center">
   <a href="https://rewire.run/">
     <img alt="rewire" src="https://rewire.run/brand/rewire-banner.png">

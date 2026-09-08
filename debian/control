@@ -1,0 +1,12 @@
+Source: ros-rolling-rewire
+Section: misc
+Priority: optional
+Maintainer: "Alvaro Gaona" <alvgaona@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libudev-dev, ros-rolling-ament-cmake, ros-rolling-ros-workspace
+Homepage: https://rewire.run
+Standards-Version: 3.9.2
+
+Package: ros-rolling-rewire
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-rolling-ament-index-python, ros-rolling-launch, ros-rolling-ros2launch, ros-rolling-ros-workspace
+Description: Launch integration for rewire, a drop-in ROS 2 bridge for the Rerun viewer.

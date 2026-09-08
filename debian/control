@@ -1,0 +1,12 @@
+Source: ros-lyrical-rewire
+Section: misc
+Priority: optional
+Maintainer: "Alvaro Gaona" <alvgaona@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libudev-dev, ros-lyrical-ament-cmake, ros-lyrical-ros-workspace
+Homepage: https://rewire.run
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-rewire
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-ament-index-python, ros-lyrical-launch, ros-lyrical-ros2launch, ros-lyrical-ros-workspace
+Description: Launch integration for rewire, a drop-in ROS 2 bridge for the Rerun viewer.
